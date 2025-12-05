@@ -1,0 +1,22 @@
+services:
+  devops:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: devops-tools
+    image: devops-tools:latest
+    stdin_open: true
+    tty: true
+    volumes:
+      # Mount kubeconfig for accessing Kubernetes clusters
+      - ./.kube:/home/devops/.kube:ro
+      # Mount docker socket for Docker commands
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount workspace directory
+      - ./workspace:/workspace
+    environment:
+      - KUBECONFIG=/home/devops/.kube/config
+    # Uncomment to use host network (useful for cluster access)
+    # network_mode: host
+    working_dir: /workspace
+    command: /bin/bash
