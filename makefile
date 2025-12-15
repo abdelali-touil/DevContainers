@@ -1,48 +1,59 @@
-.PHONY: help up down restart build logs exec shell clean force-down ps
+DOCKER := docker compose --file compose.yml --project-name devcontainer
+
+.PHONY: help up down restart build rebuild logs exec shell clean force-down ps
 
 help:
 	@echo "Docker Makefile Commands:"
+	@echo "  make install     - Create necessary directories before run initial setup"
 	@echo "  make up          - Start containers"
 	@echo "  make down        - Stop containers"
 	@echo "  make restart     - Restart containers"
 	@echo "  make build       - Build images"
 	@echo "  make rebuild     - Force rebuild images"
-	@echo "  make logs        - View container logs"
-	@echo "  make exec        - Execute command in container (CMD=...)"
-	@echo "  make shell       - Open shell in container"
+	@echo "  make logs        - View container logs (SERVICE=...)"
+	@echo "  make exec        - Execute command in container (SERVICE=... CMD=...)"
+	@echo "  make shell       - Open shell in container (SERVICE=...)"
 	@echo "  make ps          - List running containers"
-	@echo "  make clean       - Remove stopped containers"
+	@echo "  make clean       - Remove stopped containers and volumes"
 	@echo "  make force-down  - Stop and remove all containers"
 
+install:
+	mkdir -p data/maildev
+	mkdir -p data/portainer
+	mkdir -p data/jmeter
+	mkdir -p logs
+	mkdir -p secrets
+	@echo "Installation complete. You can now run 'make up' to start the containers."
+
 up:
-	docker compose up -d
+	$(DOCKER) up -d
 
 down:
-	docker compose down
+	$(DOCKER) down
 
 restart:
-	docker compose restart
+	$(DOCKER) down && $(DOCKER) up -d
 
 build:
-	docker compose build
+	$(DOCKER) build
 
 rebuild:
-	docker compose build --no-cache
+	$(DOCKER) build --no-cache
 
 logs:
-	docker compose logs -f
+	$(DOCKER) logs -f $(SERVICE)
 
 exec:
-	docker compose exec -it devops $(CMD)
+	$(DOCKER) exec -it $(SERVICE) $(CMD)
 
 shell:
-	docker compose exec -it devops sh
+	$(DOCKER) exec -it $(SERVICE) sh
 
 ps:
-	docker compose ps
+	$(DOCKER) ps
 
 clean:
-	docker compose down -v
+	$(DOCKER) down -v --rmi all --volumes --remove-orphans
 
 force-down:
-	docker compose down -v --remove-orphans
+	$(DOCKER) down -v --remove-orphans
