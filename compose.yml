@@ -8,7 +8,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - ./.kube:/home/devops/.kube:ro
+      - ./secrets/.kube:/home/devops/.kube:ro
       - /var/run/docker.sock:/var/run/docker.sock # Docker socket access for Docker-in-Docker
       - ./workspace:/workspace
     environment:

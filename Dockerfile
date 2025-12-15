@@ -46,7 +46,7 @@ RUN apk add --no-cache \
     zsh
 
 # Add custom CA certificates
-COPY certs/* /usr/local/share/ca-certificates/
+COPY secrets/certs/* /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 
 # Install k9s (Kubernetes CLI dashboard)

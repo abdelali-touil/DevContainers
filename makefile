@@ -23,6 +23,8 @@ install:
 	mkdir -p data/jmeter
 	mkdir -p logs
 	mkdir -p secrets
+	mkdir -p secrets/certs
+	mkdir -p secrets/.kube
 	@echo "Installation complete. You can now run 'make up' to start the containers."
 
 up:
@@ -57,3 +59,7 @@ clean:
 
 force-down:
 	$(DOCKER) down -v --remove-orphans
+
+clean-project:
+	$(DOCKER) down -v --rmi all --volumes --remove-orphans
+	rm -rf data logs .kube certs secrets 
