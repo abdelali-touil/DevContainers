@@ -1,12 +1,24 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
-# Create Neovim config directories
-mkdir -p /home/devops/.config/nvim
-mkdir -p /home/devops/.local/share/nvim
+USER_NAME=devops
+USER_HOME=/home/$USER_NAME
 
-# Create init.lua with Lazy.nvim configuration
-cat > /home/devops/.config/nvim/init.lua << 'NVIMEOF'
+if ! id -u "$USER_NAME" >/dev/null 2>&1; then
+    adduser -D -h "$USER_HOME" -s /bin/bash "$USER_NAME"
+fi
+
+# Create necessary directories for Neovim configuration
+mkdir -p "$USER_HOME/.config/nvim/lua/plugins"
+mkdir -p "$USER_HOME/.local/share/nvim"
+mkdir -p "$USER_HOME/.local/state/nvim"
+mkdir -p "$USER_HOME/.cache/nvim"
+
+# Define environment variables for Neovim
+chown -R "$USER_NAME:$USER_NAME" "$USER_HOME/.config" "$USER_HOME/.local" "$USER_HOME/.cache"
+
+# Create the init.lua file
+cat > "$USER_HOME/.config/nvim/init.lua" << 'NVIMEOF'
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
@@ -32,41 +44,27 @@ vim.opt.mouse = "a"
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
--- Plugins configuration
+vim.g.mapleader = " "
+
+-- Plugins sont définis ici
 require("lazy").setup({
-  -- Colorscheme
   { "folke/tokyonight.nvim", priority = 1000, config = function()
-    vim.cmd.colorscheme "tokyonight-night"
-  end },
-  
-  -- Treesitter for syntax highlighting
+      vim.cmd.colorscheme "tokyonight-night"
+    end
+  },
+
+  -- Treesitter : Utilise un fichier de configuration externe chargé après l'installation du plugin
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = { "lua", "vim", "bash", "yaml", "json", "python", "go", "rust", "dockerfile" },
-        highlight = { enable = true },
-        indent = { enable = true },
-      })
-    end,
+        require("plugins.treesitter")
+    end
   },
-  
-  -- LSP Configuration
-  {
-    "neovim/nvim-lspconfig",
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/nvim-cmp",
-      "hrsh7th/cmp-buffer",
-      "L3MON4D3/LuaSnip",
-    },
-  },
-  
-  -- Completion
-  {
-    "hrsh7th/nvim-cmp",
-    config = function()
+
+  { "neovim/nvim-lspconfig", dependencies = { "hrsh7th/cmp-nvim-lsp", "hrsh7th/nvim-cmp", "hrsh7th/cmp-buffer", "L3MON4D3/LuaSnip" } },
+
+  { "hrsh7th/nvim-cmp", config = function()
       local cmp = require("cmp")
       cmp.setup({
         snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
@@ -77,89 +75,58 @@ require("lazy").setup({
           ["<C-e>"] = cmp.mapping.abort(),
           ["<CR>"] = cmp.mapping.confirm({ select = true }),
         }),
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "buffer" },
-        }),
+        sources = cmp.config.sources({ { name = "nvim_lsp" }, { name = "buffer" } }),
       })
-    end,
+    end
   },
-  
-  -- Telescope for fuzzy finding
-  {
-    "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    config = function()
+
+  { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" }, config = function()
       require("telescope").setup()
       vim.keymap.set("n", "<leader>ff", require("telescope.builtin").find_files, {})
       vim.keymap.set("n", "<leader>fg", require("telescope.builtin").live_grep, {})
-    end,
+    end
   },
-  
-  -- File explorer
-  {
-    "nvim-tree/nvim-tree.lua",
-    config = function()
+
+  { "nvim-tree/nvim-tree.lua", config = function()
       require("nvim-tree").setup()
       vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>", { noremap = true })
-    end,
+    end
   },
-  
-  -- Status line
-  {
-    "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function()
+
+  { "nvim-lualine/lualine.nvim", dependencies = { "nvim-tree/nvim-web-devicons" }, config = function()
       require("lualine").setup()
-    end,
-  },
-  
-  -- Git integration
-  {
-    "tpope/vim-fugitive",
-  },
-  
-  -- Comment plugin
-  {
-    "numToStr/Comment.nvim",
-    config = function()
-      require("Comment").setup()
-    end,
-  },
-  
-  -- Auto pairs
-  {
-    "windwp/nvim-autopairs",
-    config = function()
-      require("nvim-autopairs").setup()
-    end,
+    end
   },
 
-  -- Which-key for command palette and keybindings help
-  {
-    "folke/which-key.nvim",
-    config = function()
-      require("which-key").setup()
-    end,
-  },
-
-  -- Cmdline UI for showing commands at bottom
-  {
-    "Shougo/ddc.vim",
-    dependencies = {
-      "vim-denops/denops.vim",
-    },
-  },
+  { "tpope/vim-fugitive" },
+  { "numToStr/Comment.nvim", config = function() require("Comment").setup() end },
+  { "windwp/nvim-autopairs", config = function() require("nvim-autopairs").setup() end },
+  { "folke/which-key.nvim", config = function() require("which-key").setup() end },
 })
-
--- Keymaps
-vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>w", ":w<CR>", { noremap = true })
-vim.keymap.set("n", "<leader>q", ":q<CR>", { noremap = true })
-vim.keymap.set("n", "<leader>Q", ":q!<CR>", { noremap = true })
 NVIMEOF
 
-# Set ownership of neovim config to devops user
-chown -R 1000:1000 /home/devops/.config /home/devops/.local
+# Create the Treesitter configuration file
+cat > "$USER_HOME/.config/nvim/lua/plugins/treesitter.lua" << 'TREESITTEREOF'
+-- Ce fichier ne sera chargé que si nvim-treesitter a été correctement installé par Lazy.nvim
+if pcall(require, "nvim-treesitter.configs") then
+    require("nvim-treesitter.configs").setup({
+        ensure_installed = { "lua", "vim", "bash", "yaml", "json", "python", "go", "rust", "dockerfile" },
+        highlight = { enable = true },
+        indent = { enable = true },
+    })
+else
+    print("WARNING: nvim-treesitter module not found, skipping configuration.")
+end
+TREESITTEREOF
 
-echo "=== Neovim configuration completed ==="
+# Download plugins using Lazy.nvim (Phase 1)
+echo "--- Téléchargement des plugins Lazy.nvim (Phase 1) ---"
+sudo -u "$USER_NAME" nvim --headless -c 'Lazy sync' -c 'quitall'
+
+# Install Treesitter parsers (Phase 2)
+echo "--- Installation des parsers Treesitter (Phase 2) ---"
+sudo -u "$USER_NAME" nvim --headless \
+  -c 'TSUpdateSync' \
+  -c 'quitall'
+
+echo "=== Neovim configuration completed on Alpine (FIXED) ==="

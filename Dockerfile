@@ -89,8 +89,8 @@ RUN /tmp/zsh.sh
 # Set working directory
 WORKDIR /workspace
 
-# Set default shell to zsh
-ENV SHELL=/bin/zsh
+# Set default shell to bash
+ENV SHELL=/bin/bash
 
 # Switch to non-root user
 USER devops
@@ -105,4 +105,4 @@ RUN echo "=== DevOps Tools Installed ===" && \
     jq --version && \
     yq --version || true
 
-CMD ["/bin/zsh"]
+CMD ["/bin/bash"]

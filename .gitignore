@@ -7,4 +7,5 @@ data/jmeter/*
 logs/*
 secrets/*
 .env
+workspace/*
 docker-compose.override.yml

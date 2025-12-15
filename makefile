@@ -55,7 +55,7 @@ ps:
 	$(DOCKER) ps
 
 clean:
-	$(DOCKER) down -v --rmi all --volumes --remove-orphans
+	$(DOCKER) down -v --volumes --remove-orphans
 
 force-down:
 	$(DOCKER) down -v --remove-orphans

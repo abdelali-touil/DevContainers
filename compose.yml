@@ -15,7 +15,7 @@ services:
       - KUBECONFIG=/home/devops/.kube/config
     # network_mode: host
     working_dir: /workspace
-    command: /bin/zsh
+    command: /bin/bash
 
   maildev:
     image: maildev/maildev
@@ -26,6 +26,7 @@ services:
     volumes:
       - ./data/maildev:/data
     restart: always
+    scale: 0
 
   portainer:
     image: portainer/portainer-ce
@@ -37,6 +38,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data/portainer:/data
     restart: always
+    scale: 0
 
   jmeter-master:
     image: justb4/jmeter:latest
@@ -54,13 +56,16 @@ services:
     depends_on:
       - jmeter-worker1
       - jmeter-worker2
+    scale: 0
   
   jmeter-worker1:
     image: justb4/jmeter:latest
     container_name: jmeter-worker1
     depends_on:
       - jmeter-worker2
+    scale: 0
 
   jmeter-worker2:
     image: justb4/jmeter:latest
     container_name: jmeter-worker2
+    scale: 0
