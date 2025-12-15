@@ -17,6 +17,9 @@ help:
 	@echo "  make ps          - List running containers"
 	@echo "  make clean       - Remove stopped containers and volumes"
 	@echo "  make force-down  - Stop and remove all containers"
+	@echo "  make clean-all   - Remove all containers, images, and volumes"
+	@echo "  make reset       - Remove all data, logs, certs, and kube secrets"
+	@echo "  make cmd         - Shortcut to execute a command container"
 
 install:
 	mkdir -p data/maildev
