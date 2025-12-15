@@ -1,3 +1,10 @@
 .vscode/*
 .kube/*
 certs/*
+data/maildev/*
+data/portainer/*
+data/jmeter/*
+logs/*
+secrets/*
+.env
+docker-compose.override.yml

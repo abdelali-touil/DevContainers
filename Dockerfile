@@ -42,7 +42,8 @@ RUN apk add --no-cache \
     openssh-client \
     rsync \
     ca-certificates \
-    openssl
+    openssl \
+    zsh
 
 # Add custom CA certificates
 COPY certs/* /usr/local/share/ca-certificates/
@@ -70,6 +71,10 @@ RUN apk add --no-cache \
 COPY config/nvim.sh /tmp/nvim.sh
 RUN chmod +x /tmp/nvim.sh
 
+# Copy and run Zsh setup script
+COPY config/zsh.sh /tmp/zsh.sh
+RUN chmod +x /tmp/zsh.sh
+
 # Create non-root user
 RUN addgroup -g 1000 devops && \
     adduser -D -u 1000 -G devops devops && \
@@ -78,11 +83,14 @@ RUN addgroup -g 1000 devops && \
 # Run Neovim setup script as root to prepare directories
 RUN /tmp/nvim.sh
 
+# Run Zsh setup script as root
+RUN /tmp/zsh.sh
+
 # Set working directory
 WORKDIR /workspace
 
-# Set default shell to bash
-ENV SHELL=/bin/bash
+# Set default shell to zsh
+ENV SHELL=/bin/zsh
 
 # Switch to non-root user
 USER devops
@@ -97,4 +105,4 @@ RUN echo "=== DevOps Tools Installed ===" && \
     jq --version && \
     yq --version || true
 
-CMD ["/bin/bash"]
+CMD ["/bin/zsh"]
