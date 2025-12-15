@@ -8,7 +8,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - ./secrets/.kube:/home/devops/.kube:ro
+      - ./secrets/.kube:/home/devops/.kube:rw
       - /var/run/docker.sock:/var/run/docker.sock # Docker socket access for Docker-in-Docker
       - ./workspace:/workspace
     environment:
@@ -26,7 +26,7 @@ services:
     volumes:
       - ./data/maildev:/data
     restart: always
-    scale: 0
+    scale: 1
 
   portainer:
     image: portainer/portainer-ce
@@ -38,7 +38,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data/portainer:/data
     restart: always
-    scale: 0
+    scale: 1
 
   jmeter-master:
     image: justb4/jmeter:latest

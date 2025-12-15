@@ -1,4 +1,5 @@
 DOCKER := docker compose --file compose.yml --project-name devcontainer
+CMD_SERVICE := devops
 
 .PHONY: help up down restart build rebuild logs exec shell clean force-down ps
 
@@ -57,9 +58,14 @@ ps:
 clean:
 	$(DOCKER) down -v --volumes --remove-orphans
 
+clean-all:
+	$(DOCKER) down -v --rmi all --volumes --remove-orphans
+
 force-down:
 	$(DOCKER) down -v --remove-orphans
 
-clean-project:
-	$(DOCKER) down -v --rmi all --volumes --remove-orphans
-	rm -rf data logs .kube certs secrets 
+reset:
+	rm -rf data logs .kube certs secrets
+
+cmd:
+	make exec SERVICE=$(CMD_SERVICE) CMD=zsh
