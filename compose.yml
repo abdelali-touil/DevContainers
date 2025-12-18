@@ -9,13 +9,14 @@ services:
     tty: true
     volumes:
       - ./secrets/.kube:/home/devops/.kube:rw
-      - /var/run/docker.sock:/var/run/docker.sock # Docker socket access for Docker-in-Docker
+      - ./secrets/.ssh:/home/devops/.ssh:rw
+      - /var/run/docker.sock:/var/run/docker.sock
       - ./workspace:/workspace
     environment:
       - KUBECONFIG=/home/devops/.kube/config
-    # network_mode: host
     working_dir: /workspace
     command: /bin/bash
+    scale: 1
 
   maildev:
     image: maildev/maildev
