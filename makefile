@@ -26,6 +26,7 @@ setup:
 	mkdir -p secrets/certs
 	mkdir -p secrets/.kube
 	mkdir -p secrets/.ssh
+	mkdir -p workspace
 	@echo "Installation complete. You can now run 'make up' to start the containers."
 
 install:
