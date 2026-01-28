@@ -4,6 +4,7 @@ certs/*
 data/maildev/*
 data/portainer/*
 data/jmeter/*
+data/etc-pihole/*
 logs/*
 secrets/*
 .env

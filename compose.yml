@@ -41,6 +41,32 @@ services:
     restart: always
     scale: 1
 
+  sonarqube:
+    image: sonarqube:latest
+    container_name: sonarqube
+    ports:
+      - "9091:9000"
+    volumes:
+      - ./data/sonarqube:/opt/sonarqube/data
+    # restart: always
+    scale: 1
+  
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "8053:53/tcp"
+      - "8053:53/udp"
+      - "8085:80/tcp" # Web interface
+    environment:
+      TZ: 'UTC'
+      WEBPASSWORD: 'admin' # Change this to a secure password
+    # Volumes store your data so it persists after restarts
+    volumes:
+      - './data/etc-pihole:/etc/pihole'
+      - './data/etc-dnsmasq.d:/etc/dnsmasq.d'
+    restart: unless-stopped
+
   jmeter-master:
     image: justb4/jmeter:latest
     container_name: jmeter-master
@@ -70,3 +96,10 @@ services:
     image: justb4/jmeter:latest
     container_name: jmeter-worker2
     scale: 0
+
+  php80-cli:
+    image: php:8.0-cli
+    volumes:
+      - ./workspace:/workspace
+    working_dir: /workspace
+    scale: 1
