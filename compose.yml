@@ -48,58 +48,22 @@ services:
       - "9091:9000"
     volumes:
       - ./data/sonarqube:/opt/sonarqube/data
-    # restart: always
-    scale: 1
-  
-  pihole:
-    container_name: pihole
-    image: pihole/pihole:latest
-    ports:
-      - "8053:53/tcp"
-      - "8053:53/udp"
-      - "8085:80/tcp" # Web interface
     environment:
-      TZ: 'UTC'
-      WEBPASSWORD: 'admin' # Change this to a secure password
-    # Volumes store your data so it persists after restarts
-    volumes:
-      - './data/etc-pihole:/etc/pihole'
-      - './data/etc-dnsmasq.d:/etc/dnsmasq.d'
-    restart: unless-stopped
-
-  jmeter-master:
-    image: justb4/jmeter:latest
-    container_name: jmeter-master
-    volumes:
-      - ./data/jmeter/test.jmx:/test/test.jmx
-      - ./data/jmeter/results:/test/results
-      - ./data/jmeter/report:/test/report
-      - ./data/jmeter/data:/test/data
-    command: >
-      -n -t /test/test.jmx
-      -R jmeter-worker1,jmeter-worker2
-      -l /test/results/results.jtl
-      -e -o /test/report
+      - SONARQUBE_JDBC_URL=jdbc:postgresql://postgres:5432/sonar
+      - SONARQUBE_JDBC_USERNAME=sonar
+      - SONARQUBE_JDBC_PASSWORD=sonar
+    scale: 1
     depends_on:
-      - jmeter-worker1
-      - jmeter-worker2
-    scale: 0
+      - postgres
   
-  jmeter-worker1:
-    image: justb4/jmeter:latest
-    container_name: jmeter-worker1
-    depends_on:
-      - jmeter-worker2
-    scale: 0
-
-  jmeter-worker2:
-    image: justb4/jmeter:latest
-    container_name: jmeter-worker2
-    scale: 0
-
-  php80-cli:
-    image: php:8.0-cli
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
     volumes:
-      - ./workspace:/workspace
-    working_dir: /workspace
+      - ./data/postgres:/var/lib/postgresql/data
+    restart: always
     scale: 1
