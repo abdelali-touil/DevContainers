@@ -1,10 +1,7 @@
 .vscode/*
 .kube/*
 certs/*
-data/maildev/*
-data/portainer/*
-data/jmeter/*
-data/etc-pihole/*
+data/*
 logs/*
 secrets/*
 .env
