@@ -18,9 +18,8 @@ help:
 setup:
 	mkdir -p data/maildev
 	mkdir -p data/portainer
-	mkdir -p data/jmeter
-	mkdir -p data/etc-pihole
 	mkdir -p data/sonarqube
+	mkdir -p data/postgres
 	mkdir -p logs
 	mkdir -p secrets
 	mkdir -p secrets/certs
