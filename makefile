@@ -58,3 +58,6 @@ ps:
 clean:
 	$(DOCKER) down -v --volumes --remove-orphans
 	rm -rf data logs certs secrets
+
+ssh: 
+	$(DOCKER) exec -it devops zsh
