@@ -1,4 +1,4 @@
-DOCKER := docker compose --file compose.yml --project-name devcontainer
+DOCKER := docker compose --file compose.yml --project-name dev-ctnr
 
 .PHONY: help setup install up down restart build logs exec ps clean
 
@@ -20,13 +20,16 @@ setup:
 	mkdir -p data/portainer
 	mkdir -p data/sonarqube
 	mkdir -p data/postgres
+	mkdir -p data/dbeaver
+	mkdir -p data/n8n
+	mkdir -p data/draw.io
 	mkdir -p logs
 	mkdir -p secrets
 	mkdir -p secrets/certs
 	mkdir -p secrets/.kube
 	mkdir -p secrets/.ssh
 	mkdir -p workspace
-	@echo "Installation complete. You can now run 'make up' to start the containers."
+	@echo "Installation complete. You can now run 'make install' to start the containers."
 
 install:
 	$(DOCKER) build --no-cache
@@ -36,7 +39,7 @@ up:
 	$(DOCKER) up -d
 
 down:
-	$(DOCKER) down
+	$(DOCKER) down -v --remove-orphans
 
 restart:
 	$(DOCKER) down -v --remove-orphans

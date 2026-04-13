@@ -27,7 +27,6 @@ services:
       - "25:1025"
     volumes:
       - ./data/maildev:/data
-    restart: always
 
   # portainer is a lightweight management UI that allows you to easily manage your Docker environments.
   portainer:
@@ -39,7 +38,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data/portainer:/data
-    restart: always
 
   # sonarqube:
   #   image: sonarqube:latest
@@ -60,13 +58,22 @@ services:
     image: postgres:latest
     container_name: postgres
     environment:
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_DB=test
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=admin_db
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - ./data/postgres:/var/lib/postgresql
-    restart: always
+
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    ports:
+      - "9003:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres 
+    depends_on:
+      - postgres
 
   n8n:
     image: n8nio/n8n:latest
@@ -89,12 +96,26 @@ services:
     volumes:
       - ./data/n8n_storage:/home/node/.n8n
 
-  drawio:
+  draw.io:
     image: jgraph/drawio:latest
-    container_name: drawio
+    container_name: draw.io
     ports:
       - "9002:8443"
     environment:
       - DRAWIO_SELF_CONTAINED=1
       # - DRAWIO_EXPORT_URL=http://localhost:8000/ --- IGNORE ---
-    restart: always
+    volumes:
+      - ./data/draw.io/data:/data
+      - ./data/draw.io/drawio_logs:/usr/local/tomcat/logs
+
+  dbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: dbeaver
+    ports:
+      - "8978:8978"
+    volumes:
+      - ./data/dbeaver:/opt/cloudbeaver/workspace
+      - ./data/dbeaver/logs:/opt/cloudbeaver/logs
+      - ./data/dbeaver/conf:/opt/cloudbeaver/conf
+      - ./data/dbeaver/extensions:/opt/cloudbeaver/extensions
+      - ./data/dbeaver/ssl:/opt/cloudbeaver/ssl

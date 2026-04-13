@@ -1,0 +1,46 @@
+services:
+  penpot-frontend:
+    image: penpotapp/frontend:latest
+    ports:
+      - "9001:80"
+    environment:
+      - PENPOT_FLAGS=enable-registration enable-login-with-password
+    depends_on:
+      - penpot-backend
+
+  penpot-backend:
+    image: penpotapp/backend:latest
+    volumes:
+      - penpot_assets:/opt/data/assets
+    environment:
+      - PENPOT_SECRET_KEY=votre_cle_secrete_generee
+      - PENPOT_DATABASE_URL=postgresql://penpot-postgres/penpot
+      - PENPOT_DATABASE_USERNAME=penpot
+      - PENPOT_DATABASE_PASSWORD=votre_mot_de_passe_db
+      - PENPOT_REDIS_URL=redis://penpot-redis:6379/0
+      - PENPOT_ASSETS_STORAGE_BACKEND=assets
+      - PENPOT_STORAGE_ASSETS_DIRECTORY=/opt/data/assets
+    depends_on:
+      - penpot-postgres
+      - penpot-redis
+
+  penpot-exporter:
+    image: penpotapp/exporter:latest
+    environment:
+      - PENPOT_PUBLIC_URI=http://penpot-frontend
+
+  penpot-postgres:
+    image: postgres:15
+    volumes:
+      - penpot_db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=penpot
+      - POSTGRES_USER=penpot
+      - POSTGRES_PASSWORD=penpot
+
+  penpot-redis:
+    image: redis:7
+
+volumes:
+  penpot_db_data:
+  penpot_assets:
