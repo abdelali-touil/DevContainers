@@ -68,17 +68,17 @@ RUN apk add --no-cache \
     tree-sitter
 
 # Copy and run Neovim setup script
-COPY config/nvim.sh /tmp/nvim.sh
+COPY ./cmd/config/nvim.sh /tmp/nvim.sh
 RUN chmod +x /tmp/nvim.sh
 
 # Copy and run Zsh setup script
-COPY config/zsh.sh /tmp/zsh.sh
+COPY ./cmd/config/zsh.sh /tmp/zsh.sh
 RUN chmod +x /tmp/zsh.sh
 
 # Create non-root user
-RUN addgroup -g 1000 devops && \
-    adduser -D -u 1000 -G devops devops && \
-    echo "devops ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN addgroup -g 1000 cmd && \
+    adduser -D -u 1000 -G cmd cmd && \
+    echo "cmd ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Run Neovim setup script as root to prepare directories
 RUN /tmp/nvim.sh
@@ -93,7 +93,7 @@ WORKDIR /workspace
 ENV SHELL=/bin/bash
 
 # Switch to non-root user
-USER devops
+USER cmd
 
 # Print installed tools info
 RUN echo "=== DevOps Tools Installed ===" && \
